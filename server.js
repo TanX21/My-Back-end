@@ -21,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({
     origin: process.env.CLIENT_BASE_URL,
     credentials: true,
+
 }));
 
 app.use("/api/user", userRouter)

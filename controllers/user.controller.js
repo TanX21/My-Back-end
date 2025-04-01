@@ -166,9 +166,9 @@ export const Login = async (req, res) => {
 
     // Generate JWT token and include the role in the payload
     const token = jwt.sign(
-      { 
-        userId: fetchedUser._id, 
-        username: fetchedUser.username, 
+      {
+        userId: fetchedUser._id,
+        username: fetchedUser.username,
         email: fetchedUser.email,
         role: fetchedUser.role,  // Include the user's role in the JWT payload
       },
@@ -177,7 +177,11 @@ export const Login = async (req, res) => {
     );
 
     // Optionally, you can set the token in a cookie if required
-    res.cookie("token", token);
+    res.cookie("token", token, {
+      httpOnly: true,        // Makes the cookie inaccessible to JavaScript (for security)
+      secure: process.env.NODE_ENV === "production",  // Set to true in production (HTTPS)
+      sameSite: "None",      // Required for cross-site cookies
+    });
 
     return res.status(200).json({
       message: "User login successful",
@@ -203,7 +207,7 @@ export const getUser = async (req, res) => {
     }
 
     // return res.status(200).json({ username: fetchedUser.username, profilePictureUrl: fetchedUser.profilePictureUrl });
-    return res.status(200).json({ user: fetchedUser});
+    return res.status(200).json({ user: fetchedUser });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error", error });
   }
@@ -247,35 +251,35 @@ export const logout = (req, res) => {
 // Forget Password
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
-  
+
   if (!email) {
-      return res.status(400).json({ message: 'Email is required' });
+    return res.status(400).json({ message: 'Email is required' });
   }
 
   try {
-      const foundUser = await user.findOne({ email });
-      if (!foundUser) {
-          return res.status(404).json({ message: 'User not found' });
-      }
+    const foundUser = await user.findOne({ email });
+    if (!foundUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-      // Generate OTP (6 digits)
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate OTP (6 digits)
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-      // OTP Expiry Time (5 minutes)
-      const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
-      
-      // Update the user with the generated OTP and expiry
-      foundUser.otp = otp;
-      foundUser.otpExpiry = otpExpiry;
-      await foundUser.save();
+    // OTP Expiry Time (5 minutes)
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
 
-      // Send OTP to user's email
-      await sendVerificationEmail(foundUser.username, foundUser.email, otp);
+    // Update the user with the generated OTP and expiry
+    foundUser.otp = otp;
+    foundUser.otpExpiry = otpExpiry;
+    await foundUser.save();
 
-      return res.status(200).json({ message: 'OTP sent to email' });
+    // Send OTP to user's email
+    await sendVerificationEmail(foundUser.username, foundUser.email, otp);
+
+    return res.status(200).json({ message: 'OTP sent to email' });
   } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Internal Server Error' });
+    console.error(error);
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
