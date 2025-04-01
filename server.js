@@ -11,12 +11,13 @@ import cors from "cors"
 import favoriteRouter from "./Routes/favorite.route.js";
 import adminrouter from "./Routes/admin.routes.js";
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3005;
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+
 app.use(cors({
     origin: process.env.CLIENT_BASE_URL,
     credentials: true,
