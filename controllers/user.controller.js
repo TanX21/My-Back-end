@@ -177,7 +177,7 @@ export const Login = async (req, res) => {
     );
 
     // Optionally, you can set the token in a cookie if required
-    res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", path: "/", sameSite: "Strict", });
+    res.cookie("token", token);
 
     return res.status(200).json({
       message: "User login successful",
