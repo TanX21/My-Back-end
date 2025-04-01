@@ -178,7 +178,7 @@ export const Login = async (req, res) => {
 
     // Optionally, you can set the token in a cookie if required
     res.cookie("token", token, {
-      httpOnly: true,        // Makes the cookie inaccessible to JavaScript (for security)
+      
       secure: process.env.NODE_ENV === "production",  // Set to true in production (HTTPS)
       sameSite: "None",      // Required for cross-site cookies
     });
